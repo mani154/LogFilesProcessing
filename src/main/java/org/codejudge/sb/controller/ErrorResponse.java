@@ -1,6 +1,8 @@
 package org.codejudge.sb.controller;
 
-public class ErrorResponse {
+import org.codejudge.sb.controller.model.Response;
+
+public class ErrorResponse extends Response {
     private String status;
     private String reason;
 
@@ -17,3 +19,5 @@ public class ErrorResponse {
         this.reason = reason;
     }
 }
+
+

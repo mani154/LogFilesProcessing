@@ -2,6 +2,7 @@ package org.codejudge.sb.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.codejudge.sb.controller.model.LogRequest;
+import org.codejudge.sb.controller.model.Response;
 import org.codejudge.sb.service.LogProcessingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,11 +16,16 @@ import java.io.IOException;
 @Slf4j
 public class AppController {
 
-    @Autowired
     LogProcessingService logProcessingService;
 
+    @Autowired
+    public AppController(LogProcessingService logProcessingService) {
+        this.logProcessingService = logProcessingService;
+    }
+
     @PostMapping("/api/process-logs/")
-    public ResponseEntity processLogs(@RequestBody LogRequest logRequest) throws IOException {
+    @ResponseBody
+    public ResponseEntity<Response> processLogs(@RequestBody LogRequest logRequest) throws IOException {
         log.info("LogRequest is " + logRequest.toString());
 
         ErrorResponse errorResponse = logRequest.validate();
@@ -27,7 +33,7 @@ public class AppController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
 
-        return ResponseEntity.ok(logProcessingService.processLogs(
+        return ResponseEntity.status(HttpStatus.OK).body(logProcessingService.processLogs(
                 logRequest.getLogFiles(),
                 logRequest.getParallelFileProcessingCount()));
     }
