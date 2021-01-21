@@ -5,14 +5,14 @@ import org.codejudge.sb.controller.model.Response;
 import java.util.*;
 
 public class ExceptionResponse extends Response {
-    private List<ExceptionDetails> logs;
+    private List<ExceptionDetails> response;
 
-    public List<ExceptionDetails> getLogs() {
-        return logs;
+    public List<ExceptionDetails> getResponse() {
+        return response;
     }
 
-    public void setLogs(List<ExceptionDetails> logs) {
-        this.logs = logs;
+    public void setResponse(List<ExceptionDetails> response) {
+        this.response = response;
     }
 
     public static ExceptionResponse create(Map<String, Map<String, Integer>> result) {
@@ -27,8 +27,8 @@ public class ExceptionResponse extends Response {
         }
         return new ExceptionResponse(exceptionDetailsList);
     }
-    public ExceptionResponse(List<ExceptionDetails> logs) {
-        this.logs = logs;
+    public ExceptionResponse(List<ExceptionDetails> response) {
+        this.response = response;
     }
 }
 
@@ -59,24 +59,24 @@ class ExceptionLog {
 }
 
 class ExceptionDetails {
-    private String timeBucket;
+    private String timestamp;
     private List<ExceptionLog> logs;
 
-    public ExceptionDetails(String timeBucket, List<ExceptionLog> logs) {
-        this.timeBucket = timeBucket;
+    public ExceptionDetails(String timestamp, List<ExceptionLog> logs) {
+        this.timestamp = timestamp;
         this.logs = logs;
     }
 
-    public void setTimeBucket(String timeBucket) {
-        this.timeBucket = timeBucket;
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
     }
 
     public void setLogs(List<ExceptionLog> logs) {
         this.logs = logs;
     }
 
-    public String getTimeBucket() {
-        return timeBucket;
+    public String getTimestamp() {
+        return timestamp;
     }
 
     public List<ExceptionLog> getLogs() {

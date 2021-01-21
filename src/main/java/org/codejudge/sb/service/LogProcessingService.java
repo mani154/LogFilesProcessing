@@ -10,6 +10,7 @@ import java.net.URL;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -18,7 +19,8 @@ import java.util.TreeMap;
 public class LogProcessingService {
 
     public ExceptionResponse processLogs(List<String> logUrls, int parallelFileProcessingCount) throws IOException {
-        return processSingleLogFile(logUrls.get(0));
+        return processMultipleLogFiles(logUrls);
+        /* return processSingleLogFile(logUrls.get(0)); */
     }
 
     private ExceptionResponse processSingleLogFile(String logFileUrl) throws IOException {
@@ -35,10 +37,33 @@ public class LogProcessingService {
             String timeBucket = getTimeBucket(zonedDateTime.getHour(), zonedDateTime.getMinute());
             // 3rd string is the exception
             System.out.println(timeBucket + "-" + values[2]);
-            Map<String, Integer> map = result.computeIfAbsent(timeBucket, x -> new TreeMap<>());
+            Map<String, Integer> map = result.computeIfAbsent(timeBucket, x -> new HashMap<>());
             map.put(values[2], map.getOrDefault(values[2], 0) + 1);
         }
         read.close();
+        return ExceptionResponse.create(result);
+    }
+
+    private ExceptionResponse processMultipleLogFiles(List<String> logFileUrlList) throws IOException {
+        Map<String, Map<String, Integer>> result = new TreeMap<>();
+        for (String logFile : logFileUrlList) {
+            URL url = new URL(logFile);
+            BufferedReader read = new BufferedReader(new InputStreamReader(url.openStream()));
+            String line;
+            while ((line = read.readLine()) != null) {
+                System.out.println(line);
+                String[] values = line.trim().split("\\s+");
+                // 2nd string is the timestamp
+                Instant timestamp = Instant.ofEpochSecond(Long.parseLong(values[1]));
+                ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(timestamp, ZoneOffset.UTC);
+                String timeBucket = getTimeBucket(zonedDateTime.getHour(), zonedDateTime.getMinute());
+                // 3rd string is the exception
+                System.out.println(timeBucket + "-" + values[2]);
+                Map<String, Integer> map = result.computeIfAbsent(timeBucket, x -> new HashMap<>());
+                map.put(values[2], map.getOrDefault(values[2], 0) + 1);
+            }
+            read.close();
+        }
         return ExceptionResponse.create(result);
     }
 
@@ -72,5 +97,5 @@ Multiple Files:
     Difference between APIs and main()
 
 Limitations:
-    My code logic omits date of logs created. Only time is considered.
+    My code's logic omits date of logs created. Only time is considered.
  */
